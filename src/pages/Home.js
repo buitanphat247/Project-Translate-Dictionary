@@ -8,6 +8,9 @@ const Home = () => {
   const [translations, setTranslations] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editWord, setEditWord] = useState(null); // Từ cần sửa
+  const [editTrans, setEditTrans] = useState(""); // Nghĩa mới
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
   useEffect(() => {
     const savedTranslations =
@@ -166,6 +169,36 @@ const Home = () => {
   const learnedCount = translations.filter((item) => item.learned).length;
   const notLearnedCount = translations.length - learnedCount;
 
+  const openEditModal = (item) => {
+    setEditWord(item.word);
+    setEditTrans(item.trans);
+    setIsEditModalVisible(true);
+  };
+
+  const handleEditOk = () => {
+    if (!editWord || !editTrans) {
+      alert("Cần nhập nghĩa mới!");
+      return;
+    }
+
+    const updatedTranslations = translations.map((item) =>
+      item.word === editWord ? { ...item, trans: editTrans } : item
+    );
+
+    setTranslations(updatedTranslations);
+    localStorage.setItem("translations", JSON.stringify(updatedTranslations));
+
+    setIsEditModalVisible(false);
+    setEditWord(null);
+    setEditTrans("");
+  };
+
+  const handleEditCancel = () => {
+    setIsEditModalVisible(false);
+    setEditWord(null);
+    setEditTrans("");
+  };
+
   return (
     <div className="bg-gray-900">
       <div className="container mx-auto p-2 text-gray-100 min-h-screen">
@@ -275,7 +308,7 @@ const Home = () => {
               <div
                 key={index}
                 onClick={() => updateLearnedStatus(item.word, !item.learned)} // Cập nhật trạng thái learned khi click
-                className={`relative border p-4 rounded-lg shadow-lg transition ${item.learned ? "border-green-500 bg-gray-700" : "border-gray-700 bg-gray-800"
+                className={`relative border px-2 py-2 rounded-lg shadow-lg transition ${item.learned ? "border-green-500 bg-gray-700" : "border-gray-700 bg-gray-800"
                   } hover:shadow-xl cursor-pointer relative`}  // Thêm relative để có thể vị trí hóa vòng tròn
               >
                 {/* Vòng tròn tick ở góc */}
@@ -307,20 +340,53 @@ const Home = () => {
                 <p className="text-gray-300 text-sm mb-2">
                   <strong>Added At:</strong> {item.addedAt || "N/A"}
                 </p>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Ngừng sự kiện click từ button
-                    removeFromLocalStorage(item.word);
-                  }}
-                  className="bg-red-500 w-[40px] h-[40px] rounded-full text-white hover:bg-red-400 transition absolute bottom-2 right-2"
-                >
-                  <i className="fa-solid fa-trash"></i>
-                </button>
+                {/* Div chứa nút Xoá và Chỉnh Sửa */}
+                <div className="absolute bottom-2 right-2 flex space-x-1">
+                  {/* Nút Xoá */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Ngừng sự kiện click từ button
+                      removeFromLocalStorage(item.word);
+                    }}
+                    className="bg-red-500 w-[30px] h-[30px] rounded-full text-white hover:bg-red-400 transition flex items-center justify-center text-sm"
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+
+                  {/* Nút Chỉnh Sửa */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Ngừng sự kiện click từ button
+                      openEditModal(item);
+                    }}
+                    className="bg-yellow-500 w-[30px] h-[30px] rounded-full text-white hover:bg-yellow-400 transition flex items-center justify-center text-sm"
+                  >
+                    <i className="fa-solid fa-pen"></i>
+                  </button>
+                </div>
+
               </div>
             ))}
           </div>
 
-
+          <Modal
+            title="Cập nhật nghĩa từ"
+            visible={isEditModalVisible}
+            onOk={handleEditOk}
+            onCancel={handleEditCancel}
+            okText="Cập nhật"
+            cancelText="Hủy bỏ"
+          >
+            <div>
+              <p><strong>Từ:</strong> {editWord}</p>
+              <textarea
+                value={editTrans}
+                onChange={(e) => setEditTrans(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Nhập nghĩa mới"
+              />
+            </div>
+          </Modal>
 
         </div>
       </div>
