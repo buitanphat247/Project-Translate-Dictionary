@@ -4,8 +4,10 @@ import { NavLink } from "react-router-dom";
 const Header = () => {
   return (
     <header className="bg-gray-800 text-gray-100 py-4 shadow-lg">
-      <nav className="container mx-auto flex justify-between items-center px-4">
+      <nav className="container mx-auto flex flex-col items-center px-4 space-y-4">
+        {/* Logo */}
         <div className="text-2xl font-bold">MoiMoi - Translate</div>
+        {/* Menu */}
         <div className="flex space-x-6">
           <NavLink
             to="/"
