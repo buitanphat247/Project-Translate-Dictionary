@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
+import { Modal } from "antd";
+
 const Home = () => {
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const [translations, setTranslations] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     const savedTranslations =
@@ -90,7 +93,21 @@ const Home = () => {
     localStorage.setItem("translations", JSON.stringify(updatedTranslations));
   };
 
+  const showConfirm = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    clearTableAndInput();
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const clearTableAndInput = () => {
+    console.log("Xóa dữ liệu...");
     setTranslations([]);
     localStorage.removeItem("translations");
     setInputText("");
@@ -151,39 +168,13 @@ const Home = () => {
 
   return (
     <div className="bg-gray-900">
-      <div className="container mx-auto p-6 text-gray-100 min-h-screen">
-        <h1 className="text-3xl font-bold text-center mb-6">Translation App</h1>
+      <div className="container mx-auto p-2 text-gray-100 min-h-screen">
 
-        <textarea
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              translateText();
-            }
-          }}
-          rows="4"
-          className="w-full p-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400"
-          placeholder="Nhập văn bản tiếng Anh"
-        ></textarea>
-
-        <div className="mt-6">
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full p-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400"
-            placeholder="Tìm kiếm từ..."
-          />
-        </div>
-
-        <div className="mt-6 text-lg font-semibold">{translatedText}</div>
-        <div className="flex flex-col md:flex-row justify-between mt-4">
+        <div className="flex flex-col md:flex-row justify-between ">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4 justify-center">
             {/* Nút Xóa tất cả */}
             <button
-              onClick={clearTableAndInput}
+              onClick={showConfirm}
               className="bg-red-500 px-4 py-2 rounded-md shadow hover:bg-red-400 transition w-full"
             >
               Xóa tất cả
@@ -240,88 +231,97 @@ const Home = () => {
               </p>
             </div>
           </div>
+
         </div>
+
+        <textarea
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              translateText();
+            }
+          }}
+          rows="4"
+          className="w-full p-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400 mt-4"
+          placeholder="Nhập văn bản tiếng Anh"
+        ></textarea>
+        <div className="mt-6">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full p-4 border border-gray-700 rounded-md bg-gray-800 text-gray-100 placeholder-gray-400"
+            placeholder="Tìm kiếm từ..."
+          />
+        </div>
+        <div className="mt-6 text-lg font-semibold">{translatedText}</div>
+        <Modal
+          title="Xác nhận"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          okText="Đồng ý"
+          cancelText="Hủy bỏ"
+        >
+          <p>Bạn có chắc chắn muốn xóa không?</p>
+        </Modal>{" "}
+
         <div className="overflow-x-auto mt-8">
-          <table className="table-auto w-full border-collapse border border-gray-700">
-            <thead>
-              <tr className="bg-gray-800">
-                <th className="border border-gray-700 px-4 py-2 text-left text-xs sm:text-sm md:text-base">
-                  Word
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-left text-xs sm:text-sm md:text-base">
-                  Meaning
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-left hidden md:table-cell text-xs sm:text-sm md:text-base">
-                  Part of Speech {/* Thêm cột "Từ loại" */}
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-left hidden md:table-cell text-xs sm:text-sm md:text-base">
-                  Pronunciation {/* Thêm cột "Phiên âm" */}
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-left hidden md:table-cell text-xs sm:text-sm md:text-base">
-                  Added At
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-center hidden md:table-cell text-xs sm:text-sm md:text-base">
-                  Learned
-                </th>
-                <th className="border border-gray-700 px-4 py-2 text-center md:table-cell text-xs sm:text-sm md:text-base">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filterTranslations().map((item, index) => (
-                <tr key={index} className="hover:bg-gray-700">
-                  <td className="border border-gray-700 px-4 py-2 text-xs sm:text-sm md:text-base">
-                    {item.word}
-                  </td>
-                  <td className="border border-gray-700 px-4 py-2 text-xs sm:text-sm md:text-base">
-                    {item.trans}
-                  </td>
 
-                  <td className="border border-gray-700 px-4 py-2 hidden md:table-cell text-xs sm:text-sm md:text-base">
-                    {item.partOfSpeech} {/* Từ loại */}
-                  </td>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filterTranslations().map((item, index) => (
+              <div
+                key={index}
+                onClick={() => updateLearnedStatus(item.word, !item.learned)} // Cập nhật trạng thái learned khi click
+                className={`relative border p-4 rounded-lg shadow-lg transition ${item.learned ? "border-green-500 bg-gray-700" : "border-gray-700 bg-gray-800"
+                  } hover:shadow-xl cursor-pointer relative`}  // Thêm relative để có thể vị trí hóa vòng tròn
+              >
+                {/* Vòng tròn tick ở góc */}
+                <div
+                  className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition ${item.learned ? "bg-green-500 text-white" : "bg-gray-500 text-gray-300"
+                    }`}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngừng sự kiện click từ đây đi
+                    updateLearnedStatus(item.word, !item.learned);
+                  }}
+                >
+                  {item.learned ? (
+                    <i className="fa-solid fa-check text-lg"></i>
+                  ) : (
+                    <i className="fa-solid fa-circle text-lg"></i>
+                  )}
+                </div>
 
-                  <td className="border border-gray-700 px-4 py-2 hidden md:table-cell text-xs sm:text-sm md:text-base">
-                    {item.pronunciation} {/* Phiên âm */}
-                  </td>
+                {/* Nội dung card */}
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  {item.word} <span className="text-sm text-gray-400">({item.partOfSpeech})</span>
+                </h3>
+                <p className="text-gray-300 text-sm mb-2">
+                  <strong>Meaning:</strong> {item.trans}
+                </p>
+                <p className="text-gray-300 text-sm mb-2 italic">
+                  <strong>Pronunciation:</strong> {item.pronunciation || "N/A"}
+                </p>
+                <p className="text-gray-300 text-sm mb-2">
+                  <strong>Added At:</strong> {item.addedAt || "N/A"}
+                </p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Ngừng sự kiện click từ button
+                    removeFromLocalStorage(item.word);
+                  }}
+                  className="bg-red-500 w-[40px] h-[40px] rounded-full text-white hover:bg-red-400 transition absolute bottom-2 right-2"
+                >
+                  <i className="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            ))}
+          </div>
 
-                  <td className="border border-gray-700 px-4 py-2 hidden md:table-cell text-xs sm:text-sm md:text-base">
-                    {item.addedAt}
-                  </td>
 
-                  <td className="border border-gray-700 px-4 py-2 text-center hidden md:table-cell text-xs sm:text-sm md:text-base">
-                    <input
-                      type="checkbox"
-                      checked={item.learned}
-                      onChange={(e) =>
-                        updateLearnedStatus(item.word, e.target.checked)
-                      }
-                      className="form-checkbox text-blue-500"
-                    />
-                  </td>
 
-                  <td className="border border-gray-700 px-4 py-2 text-center md:hidden text-xs sm:text-sm md:text-base">
-                    <button
-                      onClick={() => removeFromLocalStorage(item.word)}
-                      className="bg-red-500 p-2 rounded-md text-white hover:bg-red-400 transition"
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </td>
-
-                  <td className="border border-gray-700 px-4 py-2 text-center hidden md:table-cell text-xs sm:text-sm md:text-base">
-                    <button
-                      onClick={() => removeFromLocalStorage(item.word)}
-                      className="bg-red-500 p-2 rounded-md text-white hover:bg-red-400 transition"
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
