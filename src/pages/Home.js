@@ -303,71 +303,72 @@ const Home = () => {
 
         <div className="overflow-x-auto mt-8">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filterTranslations().map((item, index) => (
-              <div
-                key={index}
-                onClick={() => updateLearnedStatus(item.word, !item.learned)} // Cập nhật trạng thái learned khi click
-                className={`relative border px-2 py-2 rounded-lg shadow-lg transition ${item.learned ? "border-green-500 bg-gray-700" : "border-gray-700 bg-gray-800"
-                  } hover:shadow-xl cursor-pointer relative`}  // Thêm relative để có thể vị trí hóa vòng tròn
-              >
-                {/* Vòng tròn tick ở góc */}
-                <div
-                  className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition ${item.learned ? "bg-green-500 text-white" : "bg-gray-500 text-gray-300"
-                    }`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Ngừng sự kiện click từ đây đi
-                    updateLearnedStatus(item.word, !item.learned);
-                  }}
-                >
-                  {item.learned ? (
-                    <i className="fa-solid fa-check text-lg"></i>
-                  ) : (
-                    <i className="fa-solid fa-circle text-lg"></i>
-                  )}
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  {filterTranslations().map((item, index) => (
+    <div
+      key={index}
+      onClick={() => updateLearnedStatus(item.word, !item.learned)}
+      className={`relative border px-4 py-4 rounded-lg shadow-lg transition ${item.learned ? "border-green-500 bg-gray-700" : "border-gray-700 bg-gray-800"
+        } hover:shadow-xl cursor-pointer min-w-0`} // Đảm bảo độ rộng tối thiểu không phá vỡ layout
+    >
+      {/* Vòng tròn tick ở góc */}
+      <div
+        className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer transition ${item.learned ? "bg-green-500 text-white" : "bg-gray-500 text-gray-300"
+          }`}
+        onClick={(e) => {
+          e.stopPropagation(); // Ngừng sự kiện click từ đây đi
+          updateLearnedStatus(item.word, !item.learned);
+        }}
+      >
+        {item.learned ? (
+          <i className="fa-solid fa-check text-lg"></i>
+        ) : (
+          <i className="fa-solid fa-circle text-lg"></i>
+        )}
+      </div>
 
-                {/* Nội dung card */}
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {item.word} <span className="text-sm text-gray-400">({item.partOfSpeech})</span>
-                </h3>
-                <p className="text-gray-300 text-sm mb-2">
-                  <strong>Meaning:</strong> {item.trans}
-                </p>
-                <p className="text-gray-300 text-sm mb-2 italic">
-                  <strong>Pronunciation:</strong> {item.pronunciation || "N/A"}
-                </p>
-                <p className="text-gray-300 text-sm mb-2">
-                  <strong>Added At:</strong> {item.addedAt || "N/A"}
-                </p>
-                {/* Div chứa nút Xoá và Chỉnh Sửa */}
-                <div className="absolute bottom-2 right-2 flex space-x-1">
-                  {/* Nút Xoá */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Ngừng sự kiện click từ button
-                      removeFromLocalStorage(item.word);
-                    }}
-                    className="bg-red-500 w-[30px] h-[30px] rounded-full text-white hover:bg-red-400 transition flex items-center justify-center text-sm"
-                  >
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
+      {/* Nội dung card */}
+      <h3 className="text-base font-semibold text-white mb-2 break-words"> {/* Điều chỉnh kích thước chữ */}
+        {item.word} <span className="text-sm text-gray-400">({item.partOfSpeech})</span>
+      </h3>
+      <p className="text-gray-300 text-sm mb-2 break-words">
+        <strong>Meaning:</strong> {item.trans}
+      </p>
+      <p className="text-gray-300 text-sm mb-2 italic">
+        <strong>Pronunciation:</strong> {item.pronunciation || "N/A"}
+      </p>
+      <p className="text-gray-300 text-sm mb-2">
+        <strong>Added At:</strong> {item.addedAt || "N/A"}
+      </p>
 
-                  {/* Nút Chỉnh Sửa */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Ngừng sự kiện click từ button
-                      openEditModal(item);
-                    }}
-                    className="bg-yellow-500 w-[30px] h-[30px] rounded-full text-white hover:bg-yellow-400 transition flex items-center justify-center text-sm"
-                  >
-                    <i className="fa-solid fa-pen"></i>
-                  </button>
-                </div>
+      {/* Div chứa nút Xoá và Chỉnh Sửa */}
+      <div className="absolute bottom-2 right-2 flex space-x-1">
+        {/* Nút Xoá */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Ngừng sự kiện click từ button
+            removeFromLocalStorage(item.word);
+          }}
+          className="bg-red-500 w-[28px] h-[28px] rounded-full text-white hover:bg-red-400 transition flex items-center justify-center text-xs" // Giảm kích thước trên mobile
+        >
+          <i className="fa-solid fa-trash"></i>
+        </button>
 
-              </div>
-            ))}
-          </div>
+        {/* Nút Chỉnh Sửa */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // Ngừng sự kiện click từ button
+            openEditModal(item);
+          }}
+          className="bg-yellow-500 w-[28px] h-[28px] rounded-full text-white hover:bg-yellow-400 transition flex items-center justify-center text-xs" // Giảm kích thước trên mobile
+        >
+          <i className="fa-solid fa-pen"></i>
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
 
           <Modal
             title="Cập nhật nghĩa từ"
