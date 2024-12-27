@@ -5,7 +5,7 @@ import HomeControl from "../Components/HomeControl";
 import VocabLearned from "../Components/VocabLearned";
 import VocabNotLearned from "../Components/VocabNotLearned";
 import OverviewVocab from "../Components/OverviewVocab";
-
+import { DatePicker, Space } from 'antd';
 const Home = () => {
   // State quản lý các giá trị trong ứng dụng
   const [inputText, setInputText] = useState(""); // Text người dùng nhập vào
@@ -16,7 +16,7 @@ const Home = () => {
   const [editTrans, setEditTrans] = useState(""); // Nghĩa mới đang chỉnh sửa
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // Hiển thị modal chỉnh sửa
   const [searchInput, setSearchInput] = useState(""); // Text tìm kiếm trong bảng
-
+  const [dateFilter, setDateFilter] = useState('')
   // Tải danh sách từ dịch từ LocalStorage khi ứng dụng khởi động
   useEffect(() => {
     const storedTranslations = JSON.parse(localStorage.getItem("translations"));
@@ -209,6 +209,9 @@ const Home = () => {
     setEditWord(null);
     setEditTrans("");
   };
+
+  const { RangePicker } = DatePicker;
+
   return (
     <>
       <div className="bg-gray-900">
@@ -226,6 +229,7 @@ const Home = () => {
             translateText={translateText}
             learnedCount={learnedCount}
             notLearnedCount={notLearnedCount}
+            setDateFilter={setDateFilter}
           />
           <div className="mt-6 text-lg font-semibold">
             Nghĩa {inputText || 'NULL'}: {translatedText}
@@ -246,6 +250,7 @@ const Home = () => {
                   updateLearnedStatus={updateLearnedStatus}
                   removeFromLocalStorage={removeFromLocalStorage}
                   openEditModal={openEditModal}
+                  dateFilter={dateFilter}
                 ></OverviewVocab>,
               },
               {
@@ -256,6 +261,7 @@ const Home = () => {
                   updateLearnedStatus={updateLearnedStatus}
                   removeFromLocalStorage={removeFromLocalStorage}
                   openEditModal={openEditModal}
+                  dateFilter={dateFilter}
                 ></VocabLearned>,
               },
               {
@@ -266,6 +272,7 @@ const Home = () => {
                   updateLearnedStatus={updateLearnedStatus}
                   removeFromLocalStorage={removeFromLocalStorage}
                   openEditModal={openEditModal}
+                  dateFilter={dateFilter}
                 ></VocabNotLearned>,
               },
             ]}

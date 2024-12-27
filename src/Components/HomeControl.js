@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from 'react';
+import { DatePicker, Select, Space, TimePicker } from 'antd';
+import dayjs from "dayjs"; // Thêm thư viện dayjs để xử lý ngày (nếu cần)
 
 const HomeControl = ({
     inputText,
@@ -10,8 +12,17 @@ const HomeControl = ({
     exportToExcel,
     translateText,
     learnedCount,
-    notLearnedCount,
+    notLearnedCount, setDateFilter
+
 }) => {
+    const handleDateChange = (date, dateString) => {
+        // `date` là đối tượng Day.js hoặc null khi không có ngày được chọn
+        // `dateString` là giá trị định dạng từ picker (YYYY-MM-DD)
+        console.log("Raw Value:", date); // Xem đối tượng ngày
+        const formattedDate = dayjs(date).format("MM/DD/YYYY");
+        console.log("Formatted Date:", formattedDate);
+        setDateFilter(formattedDate) // Lưu giá trị nếu muốn
+    };
     return (
         <>
             <div className="flex flex-col md:flex-row justify-between">
@@ -54,6 +65,8 @@ const HomeControl = ({
                     >
                         <i className="fas fa-language text-xl mr-2"></i> {/* Icon dịch */}
                     </button>
+                    {/* <DatePicker renderExtraFooter={() => 'extra footer'} onChange={handleDateChange} />*/}
+
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-2">
