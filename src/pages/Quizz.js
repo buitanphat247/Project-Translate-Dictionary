@@ -122,7 +122,7 @@ const Quizz = () => {
 
         {!start && Object.keys(questionsGroupedByDate).map((dateKey) => (
           <div key={dateKey} className="my-6 bg-gray-800 rounded-lg shadow-lg p-2 w-full max-w-2xl mx-auto">
-            <div className="text-white font-bold text-2xl text-center">
+            <div className="text-white font-bold text-2xl sm:text-xl md:text-2xl text-center">
               <span>{dateKey}</span>
             </div>
 
@@ -130,7 +130,7 @@ const Quizz = () => {
             <div className="mt-4 space-y-2">
               {/* Từ Đã Học */}
               <button
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 hover:scale-105"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 text-sm sm:text-base lg:text-lg"
                 onClick={() => handleGameStart(dateKey, "learned")}
               >
                 Từ Đã Học ({questionsGroupedByDate[dateKey].learned.length})
@@ -138,7 +138,7 @@ const Quizz = () => {
 
               {/* Từ Chưa Học */}
               <button
-                className="w-full bg-green-600 hover:bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 hover:scale-105"
+                className="w-full bg-green-600 hover:bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 text-sm sm:text-base lg:text-lg"
                 onClick={() => handleGameStart(dateKey, "notLearned")}
               >
                 Từ Chưa Học ({questionsGroupedByDate[dateKey].notLearned.length})
@@ -146,7 +146,7 @@ const Quizz = () => {
 
               {/* Tất Cả */}
               <button
-                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 hover:scale-105"
+                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 px-6 rounded-lg shadow-lg transform transition duration-200 text-sm sm:text-base lg:text-lg"
                 onClick={() => handleGameStart(dateKey, "all")}
               >
                 Tất Cả ({questionsGroupedByDate[dateKey].all.length})
@@ -158,52 +158,51 @@ const Quizz = () => {
 
       {/* Hiển thị trò chơi quiz */}
       {start && selectedGame && questions.length > 0 && (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 container gap-5 p-2">
-    {questions.map((q, idx) => (
-      <div
-        key={idx}
-        className="bg-gray-800 p-6 rounded-lg shadow-lg transition-all duration-300 transform "
-        style={{ backgroundColor: "#2D2D2D" }}
-      >
-        <h2 className="text-xl font-semibold mb-6 text-white">
-          {idx + 1}. What is the meaning of:{" "}
-          <span className="text-blue-400">{q.word}</span>?
-        </h2>
-
-        <div className="space-y-3">
-          {q.options.map((option, optionIdx) => (
-            <button
-              key={optionIdx}
-              onClick={() => handleOptionClick(idx, option)}
-              className={`w-full px-6 py-3 text-lg font-medium rounded-lg border-2 transition duration-300 ${
-                q.userAnswer === option
-                  ? option === q.correct
-                    ? "bg-green-500 text-white border-green-700"
-                    : "bg-red-500 text-white border-red-700"
-                  : "bg-gray-700 text-white border-gray-600 hover:bg-gray-600 hover:border-white"
-              }`}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 container gap-5 p-2">
+          {questions.map((q, idx) => (
+            <div
+              key={idx}
+              className="bg-gray-800 p-3 rounded-lg shadow-lg transition-all duration-300 transform "
+              style={{ backgroundColor: "#2D2D2D" }}
             >
-              {option}
-            </button>
+              <h2 className="text-md mb-2 font-semibold text-white">
+                {idx + 1}. What is the meaning of:{" "}
+                <span className="text-blue-400">{q.word}</span>?
+              </h2>
+
+              <div className="space-y-3">
+                {q.options.map((option, optionIdx) => (
+                  <button
+                    key={optionIdx}
+                    onClick={() => handleOptionClick(idx, option)}
+                    className={`w-full p-2 text-sm font-medium rounded-lg border-2 transition duration-300 ${q.userAnswer === option
+                      ? option === q.correct
+                        ? "bg-green-500 text-white border-green-700"
+                        : "bg-red-500 text-white border-red-700"
+                      : "bg-gray-700 text-white border-gray-600 hover:bg-gray-600 hover:border-white"
+                      }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+
+              {/* Feedback cho câu trả lời */}
+              <p
+                className={`mt-4 text-md sm:text-sm md:text-md font-medium ${q.feedback === "Correct! Well done."
+                  ? "text-green-400"
+                  : "text-red-500"
+                  }`}
+              >
+                {q.feedback}
+              </p>
+            </div>
           ))}
         </div>
-
-        {/* Feedback cho câu trả lời */}
-        <p
-          className={`mt-4 text-md font-medium ${
-            q.feedback === "Correct! Well done."
-              ? "text-green-400"
-              : "text-red-500"
-          }`}
-        >
-          {q.feedback}
-        </p>
-      </div>
-    ))}
-  </div>
-)}
+      )}
 
     </div>
+
 
   );
 };

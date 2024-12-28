@@ -70,7 +70,10 @@ const Home = () => {
   // Thêm từ dịch mới vào danh sách
   const addNewTranslation = (word, translation) => {
     const now = new Date();
-    const formattedDate = now.toLocaleString();
+
+    const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+
+    console.log(formattedDate); // Kết quả: mm/dd/yyyy
 
     const newTranslation = {
       word,
@@ -150,31 +153,65 @@ const Home = () => {
     XLSX.writeFile(wb, "translations.xlsx");
   };
 
-  // Nhập dữ liệu từ file Excel vào bảng
+
+
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+  
     const reader = new FileReader();
     reader.onload = (evt) => {
       const wb = XLSX.read(evt.target.result, { type: "binary" });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
-
-      const newTranslations = data.map((row) => ({
-        word: row["Word"] || "",
-        trans: row["Meaning"] || "",
-        addedAt: new Date().toLocaleString(),
-        learned: row["Learned"] === "Yes",
-      }));
-
-      const updatedTranslations = [...translations, ...newTranslations];
+  
+      // Hàm chuyển đổi ngày Excel serial thành ngày JS
+      const convertExcelDateToJSDate = (serialDate) => {
+        // Ngày bắt đầu của Excel là 01/01/1900 (serial 1), cộng thêm 1 vì Excel giả định năm 1900 là năm nhuận
+        const excelEpoch = new Date(1899, 11, 30); // 30/12/1899 (Vì Excel sử dụng ngày 01/01/1900 là ngày đầu tiên)
+        const msPerDay = 86400000; // Số mili giây trong một ngày
+        return new Date(excelEpoch.getTime() + (serialDate + 1) * msPerDay); // Cộng thêm 1 ngày
+      };
+  
+      // Chuyển đổi dữ liệu từ file Excel và chuẩn bị mảng mới
+      const newTranslations = data.map((row) => {
+        const addedAt = row["AddedAt"];
+        let formattedAddedAt = "";
+  
+        // Kiểm tra xem AddedAt có phải là số serial không
+        if (!isNaN(addedAt)) {
+          // Nếu AddedAt là số serial, chuyển thành ngày hợp lệ
+          formattedAddedAt = convertExcelDateToJSDate(addedAt).toLocaleDateString("en-US"); // Chuyển thành định dạng mm/dd/yyyy
+        } else {
+          formattedAddedAt = addedAt || ""; // Giữ nguyên nếu AddedAt đã là ngày hợp lệ
+        }
+  
+        return {
+          word: row["Word"] || "",
+          trans: row["Meaning"] || "",
+          addedAt: formattedAddedAt,
+          learned: row["Learned"] === "Yes",
+        };
+      });
+  
+      // Lấy dữ liệu hiện tại từ localStorage (nếu có) và kết hợp với dữ liệu mới
+      const currentTranslations = JSON.parse(localStorage.getItem("translations")) || [];
+  
+      // Kết hợp dữ liệu cũ và mới
+      const updatedTranslations = [...currentTranslations, ...newTranslations];
+  
+      // Lưu lại vào localStorage
+      localStorage.setItem("translations", JSON.stringify(updatedTranslations));
+  
+      // Cập nhật vào state nếu cần thiết (nếu bạn sử dụng React hoặc tương tự)
       setTranslations(updatedTranslations);
-      saveToLocalStorage(updatedTranslations);
     };
-
+  
     reader.readAsBinaryString(file);
   };
+  
+  
+
 
   // Đếm từ đã học và chưa học
   const learnedCount = translations.filter((item) => item.learned).length;
