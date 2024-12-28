@@ -36,19 +36,21 @@ const HomeControl = ({
                     </button>
 
                     {/* Nhập Excel Button với icon */}
-                    <label htmlFor="upload-file" className="cursor-pointer w-full">
-                        <button
-                            className="bg-green-500 hover:bg-green-400 text-white font-semibold py-2 px-4 rounded-md shadow-md w-full flex items-center justify-center transition duration-200"
+                    <div className="w-full ">
+                        <label
+                            htmlFor="upload-file"
+                            className="cursor-pointer bg-green-500 hover:bg-green-400 text-white font-semibold py-2 px-4 rounded-md shadow-md w-full flex items-center justify-center transition duration-200"
                         >
                             <i className="fas fa-file-upload text-xl mr-2"></i> {/* Icon upload */}
-                        </button>
+                        </label>
                         <input
                             id="upload-file"
                             type="file"
                             onChange={handleFileUpload}
                             className="hidden"
                         />
-                    </label>
+                    </div>
+
 
                     {/* Xuất Excel Button với icon */}
                     <button
