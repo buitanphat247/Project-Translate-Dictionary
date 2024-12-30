@@ -140,6 +140,18 @@ const Home = () => {
 
   // Xuất danh sách từ thành file Excel
   const exportToExcel = () => {
+    // Lấy ngày và giờ hiện tại
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Tháng từ 0 đến 11 nên phải cộng thêm 1
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
+    // Tạo tên file với định dạng: Tep-tu-vung-YYYY-MM-DD-HH-mm-ss.xlsx
+    const fileName = `Tep-tu-vung-${year}-${month}-${day}-${hours}-${minutes}-${seconds}.xlsx`;
+
     const dataToExport = translations.map((item) => ({
       Word: item.word,
       Meaning: item.trans,
@@ -150,7 +162,9 @@ const Home = () => {
     const ws = XLSX.utils.json_to_sheet(dataToExport);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Translations");
-    XLSX.writeFile(wb, "translations.xlsx");
+
+    // Lưu file Excel với tên vừa tạo
+    XLSX.writeFile(wb, fileName);
   };
 
 
@@ -158,13 +172,13 @@ const Home = () => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
+
     const reader = new FileReader();
     reader.onload = (evt) => {
       const wb = XLSX.read(evt.target.result, { type: "binary" });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws);
-  
+
       // Hàm chuyển đổi ngày Excel serial thành ngày JS
       const convertExcelDateToJSDate = (serialDate) => {
         // Ngày bắt đầu của Excel là 01/01/1900 (serial 1), cộng thêm 1 vì Excel giả định năm 1900 là năm nhuận
@@ -172,12 +186,12 @@ const Home = () => {
         const msPerDay = 86400000; // Số mili giây trong một ngày
         return new Date(excelEpoch.getTime() + (serialDate + 1) * msPerDay); // Cộng thêm 1 ngày
       };
-  
+
       // Chuyển đổi dữ liệu từ file Excel và chuẩn bị mảng mới
       const newTranslations = data.map((row) => {
         const addedAt = row["AddedAt"];
         let formattedAddedAt = "";
-  
+
         // Kiểm tra xem AddedAt có phải là số serial không
         if (!isNaN(addedAt)) {
           // Nếu AddedAt là số serial, chuyển thành ngày hợp lệ
@@ -185,7 +199,7 @@ const Home = () => {
         } else {
           formattedAddedAt = addedAt || ""; // Giữ nguyên nếu AddedAt đã là ngày hợp lệ
         }
-  
+
         return {
           word: row["Word"] || "",
           trans: row["Meaning"] || "",
@@ -193,24 +207,24 @@ const Home = () => {
           learned: row["Learned"] === "Yes",
         };
       });
-  
+
       // Lấy dữ liệu hiện tại từ localStorage (nếu có) và kết hợp với dữ liệu mới
       const currentTranslations = JSON.parse(localStorage.getItem("translations")) || [];
-  
+
       // Kết hợp dữ liệu cũ và mới
       const updatedTranslations = [...currentTranslations, ...newTranslations];
-  
+
       // Lưu lại vào localStorage
       localStorage.setItem("translations", JSON.stringify(updatedTranslations));
-  
+
       // Cập nhật vào state nếu cần thiết (nếu bạn sử dụng React hoặc tương tự)
       setTranslations(updatedTranslations);
     };
-  
+
     reader.readAsBinaryString(file);
   };
-  
-  
+
+
 
 
   // Đếm từ đã học và chưa học
