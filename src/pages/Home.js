@@ -28,10 +28,9 @@ const Home = () => {
   // Hàm dịch từ sử dụng API bên thứ ba
   const translateText = async () => {
     if (isWordInTable(inputText)) {
-      alert("Từ này đã tồn tại trong bảng."); // Kiểm tra từ đã có chưa
-      return;
+      toast.error("Từ này đã tồn tại trong bảng."); // Sử dụng toast để hiển thị thông báo lỗi return; }
+      return
     }
-
     // Cấu hình API
     const apiConfig = {
       url: "https://google-translate113.p.rapidapi.com/api/v1/translator/text",
